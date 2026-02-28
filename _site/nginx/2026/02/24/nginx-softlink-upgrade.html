@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="/blogs.github.io/article_blog_sign_icon-icons.com_51086.ico">
+    <title>Nginx 软链接升级流程 - 极客</title>
+    <!-- 引入 CSS，注意 relative_url -->
+    <link rel="stylesheet" href="/blogs.github.io/assets/css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- 顶部导航 -->
+        <header>
+            <a href="/blogs.github.io/" class="site-title">极客</a>
+            <nav>
+                
+                <a href="/blogs.github.io/">首页</a>
+                
+                <a href="/blogs.github.io/blog.md">归档</a>
+                
+            </nav>
+        </header>
+
+        <!-- 页面主要内容 -->
+        <main>
+            <article class="post">
+    <header class="post-header">
+        <h1 class="post-title">Nginx 软链接升级流程</h1>
+        <div class="post-meta">
+            <time>2026年02月24日</time>
+        </div>
+    </header>
+
+    <div class="post-content">
+        <ul>
+  <li>
+    <p>创建nginx软链接 #替换 从而让用户实现无感</p>
+  </li>
+  <li>获取源码：
+    <ul>
+      <li>wget http://nginx…… -P /root/test/</li>
+    </ul>
+  </li>
+  <li>在/root/test/nginx-1.20下解压
+    <ul>
+      <li>tar -zxvf /root/test/nginx-1.20.tar.gz -C /root/test/nginx_1.20/</li>
+    </ul>
+  </li>
+  <li>编译源码：
+    <ul>
+      <li>在/root/test/nginx_1.20/nginx1.20 下 ./configure –prefix=/root/test/nginx_1.20</li>
+      <li>make</li>
+      <li>make install</li>
+      <li>当前目录下可看到configure文件</li>
+    </ul>
+  </li>
+  <li>在前一个目录检查：
+    <ul>
+      <li>/root/test/nginx-1.24/sbin/nginx -v</li>
+    </ul>
+  </li>
+  <li>之前已经创建的软链接：
+    <ul>
+      <li>ln -s /root/test/nginx-1.20  /usr/local/nginx
+        <ul>
+          <li>源文件是在源码编译后的目录</li>
+          <li>/usr/local/nginx -&gt; /root/test/nginx-1.20    #当前软链接</li>
+          <li>
+            <table>
+              <tbody>
+                <tr>
+                  <td>确认nginx正在运行：ps -ef</td>
+                  <td>grep nginx</td>
+                </tr>
+              </tbody>
+            </table>
+          </li>
+          <li>ls -l /usr/local/nginx     #软链接指向</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>备份软链接指向的路径 #防止出错回退
+    <ul>
+      <li>cp -r /usr/local/nginx  /root/test/nginx-backup-1.20
+        <ul>
+          <li>物理备份</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>创建新的源码</li>
+  <li>编译安装</li>
+  <li>
+    <p>建立新的软链接</p>
+  </li>
+  <li>方案A：
+    <ul>
+      <li>直接覆盖原链接（用户不中断）</li>
+      <li>ln -sfn /root/test/nginx-1.22   /usr/local/nginx
+        <ul>
+          <li>-f 如果存在旧链接则覆盖</li>
+          <li>-n 处理目标是目录时不进入目录</li>
+        </ul>
+      </li>
+      <li>立即指向新版本</li>
+      <li>如果新版本异常 #立即回滚
+        <ul>
+          <li>ln -sfn /root/test/nginx-1.20_backup /usr/local/nginx</li>
+          <li>/usr/local/nginx/sbin/nginx -s reload</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>方案B：
+    <ul>
+      <li>创建新链接</li>
+      <li>停nginx/reload后切换
+        <ul>
+          <li>systemctl stop nginx</li>
+          <li>mv /usr/local/nginx  /usr/local/nginx_backup</li>
+          <li>mv /usr/local/nginx1.22  /usr/local/nginx</li>
+          <li>systemctl start nginx</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+    </div>
+</article>
+        </main>
+
+        <!-- 底部版权 -->
+        <footer>
+            <p>&copy; 2026 极客. Powered by Jekyll.</p>
+        </footer>
+    </div>
+
+</body>
+</html>
