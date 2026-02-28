@@ -1,6 +1,4 @@
 title: My Tech Blog
-baseurl: ""
+baseurl: "/blogs.github.io"
 url: "https://fightingforme.github.io"
 
-markdown: kramdown
-theme: minima
