@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="/blogs.github.io/article_blog_sign_icon-icons.com_51086.ico">
+    <title>Rsync远程同步文件时的排错流程 - 极客</title>
+    <!-- 引入 CSS，注意 relative_url -->
+    <link rel="stylesheet" href="/blogs.github.io/assets/css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- 顶部导航 -->
+        <header>
+            <a href="/blogs.github.io/" class="site-title">极客</a>
+            <nav>
+                
+                <a href="/blogs.github.io/">首页</a>
+                
+                <a href="/blogs.github.io/blog.md">归档</a>
+                
+            </nav>
+        </header>
+
+        <!-- 页面主要内容 -->
+        <main>
+            <article class="post">
+    <header class="post-header">
+        <h1 class="post-title">Rsync远程同步文件时的排错流程</h1>
+        <div class="post-meta">
+            <time>2026年03月05日</time>
+        </div>
+    </header>
+
+    <div class="post-content">
+        <h3 id="配置rsync服务">配置Rsync服务：</h3>
+
+<h4 id="server10005"><strong>Server(10.0.0.5)：</strong></h4>
+
+<ul>
+  <li>
+    <p>dnf install rsync -y</p>
+  </li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>dnf list installed</td>
+          <td>grep rsync</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>vim /etc/rsync.conf</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fake super = yes
+uid = rsync
+gid = rsync
+use chroot = no
+max connections = 2000
+log file = /var/log/rsyncd.log
+read only = false
+list = false
+ignore errors = yes
+hosts allow = 10.0.0.210/24
+#hosts deny = 0.0.0.0/24
+auth users = rsync_backup
+secrets file = /etc/rsyncd.passwd
+#####################################
+[data]
+path = /data
+comment = test module	
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p>useradd -s /sbin/nologin -M rsync</p>
+
+    <ul>
+      <li>创建虚拟用户来启动Rsync进程</li>
+    </ul>
+  </li>
+  <li>
+    <p>echo ‘rsync_backup:123456’ &gt; /etc/rsyncd.passwd</p>
+  </li>
+  <li>
+    <p>chmod 600 /etc/rsyncd.passwd</p>
+  </li>
+  <li>
+    <p>mkdir -p /data/</p>
+  </li>
+  <li>chown -R rsync:rsync /data/
+    <ul>
+      <li>创建模块路径对应文件名</li>
+      <li>-R递归更改</li>
+    </ul>
+  </li>
+  <li>
+    <p>rsync –daemon</p>
+
+    <ul>
+      <li>旨在将rsync升级为后台守护进程，监听文件传输，端口为873</li>
+    </ul>
+  </li>
+  <li>
+    <p>systemctl enable rsyncd</p>
+  </li>
+  <li>
+    <p>systemctl start rsyncd</p>
+  </li>
+  <li>systemctl status rsyncd</li>
+</ul>
+
+<h5 id="本地测试">本地测试：</h5>
+<ul>
+  <li>
+    <p>touch ./a.txt</p>
+  </li>
+  <li>
+    <p>rsync -Paz ./a.txt rsync_backup@10.0.0.5::data</p>
+  </li>
+</ul>
+
+<h4 id="client1000210"><strong>Client(10.0.0.210):</strong></h4>
+<ul>
+  <li>
+    <p>echo ‘123456’ &gt; /etc/client.passwd</p>
+
+    <ul>
+      <li>文件名及位置无硬性要求</li>
+    </ul>
+  </li>
+  <li>
+    <p>chmod 600 /etc/client.passwd</p>
+  </li>
+  <li>
+    <p>touch ./asd.txt</p>
+  </li>
+  <li>
+    <p>rsync -Paz ./asd.txt rsync_backup@10.0.0.5::data</p>
+  </li>
+  <li>rsync -paz /etc/hostname rsync_backup@10.0.0.5::data –password-file /etc/client.passwd
+    <ul>
+      <li>使用密码文件传输，减少手输密码</li>
+    </ul>
+  </li>
+  <li>
+    <p>/var/log/rsync.log</p>
+
+    <ul>
+      <li>
+        <p><strong>日志非常重要</strong>，可以多开一个窗口查看错误输出</p>
+      </li>
+      <li>
+        <p>tail -f /var/log/rsync.log</p>
+      </li>
+    </ul>
+  </li>
+  <li>注意：SElinux/firewalld或许会阻止</li>
+</ul>
+
+
+    </div>
+</article>
+        </main>
+
+        <!-- 底部版权 -->
+        <footer>
+            <p>&copy; 2026 极客. Powered by Jekyll.</p>
+        </footer>
+    </div>
+
+</body>
+</html>
