@@ -1,40 +1,14 @@
-<section id="features" class="py-5 bg-light">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold">为什么选择我？</h2>
-      <p class="text-muted">因为够专业！！！</p>
-    </div>
+- title: "自动化流程"
+  desc: "通过 AI 技术自动处理您的日常任务，节省百分之八十的时间。"
+  icon: "bi-cpu"
+  image: "/assets/image/f1.jpg"
 
-    <div class="row g-4">
+- title: "实时协作"
+  desc: "多端同步，团队成员可以随时随地共享进度，无缝对接。"
+  icon: "bi-people"
+  image: "/assets/image/f2.jpg"
 
-      {% for item in site.data.features %}
-      <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm hover-up">
-          <div class="card-body p-4 text-center">
-
-            <!-- 使用 Bootstrap Icons -->
-            <div class="feature-icon bg-primary bg-gradient text-white mb-3 d-inline-flex align-items-center justify-content-center rounded-3" style="width: 60px; height: 60px;">
-              <i class="bi {{ item.icon }} fs-3"></i>
-            </div>
-
-            <h5 class="fw-bold">{{ item.title }}</h5>
-
-            <p class="text-muted small">{{ item.desc }}</p>
-
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-<!-- 简单 CSS 让卡片有悬停浮起效果 -->
-
-<style>
-  .hover-up:hover {
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
-  }
-</style>
+- title: "数据可视化"
+  desc: "精美的图表助您洞察业务增长点，决策更有据可依。"
+  icon: "bi-graph-up-arrow"
+  image: "/assets/image/f3.jpg"
